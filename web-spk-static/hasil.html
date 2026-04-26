@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Akhir - SPK Kost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-12 text-center mb-5">
+                <h2 class="display-5">Perbandingan Hasil Akhir</h2>
+                <p class="lead">Peringkat Alternatif berdasarkan Metode SAW dan WP</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- SAW Results -->
+            <div class="col-md-6 mb-4">
+                <div class="glass-card h-100">
+                    <h4 class="text-center mb-4"><i class="fas fa-calculator me-2 text-pink"></i>Metode SAW</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="bg-pink text-white">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Alternatif</th>
+                                    <th>Nilai V</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-saw"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP Results -->
+            <div class="col-md-6 mb-4">
+                <div class="glass-card h-100">
+                    <h4 class="text-center mb-4"><i class="fas fa-chart-line me-2 text-pink"></i>Metode WP</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="bg-pink text-white">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Alternatif</th>
+                                    <th>Nilai V</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-wp"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="glass-card bg-pink text-white text-center">
+                    <h3><i class="fas fa-trophy me-2"></i>Rekomendasi Terbaik</h3>
+                    <p class="lead mb-0">Berdasarkan konsensus kedua metode, alternatif terbaik adalah:</p>
+                    <h1 class="display-4 fw-bold mt-2" id="best-alt">-</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const saw = calculateSAW();
+            const wp = calculateWP();
+
+            const bodySaw = document.getElementById('body-saw');
+            saw.ranks.forEach((r, index) => {
+                bodySaw.innerHTML += `
+                    <tr class="${index === 0 ? 'table-pink fw-bold' : ''}">
+                        <td>${index + 1}</td>
+                        <td>${r.nama}</td>
+                        <td>${r.value.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
+            const bodyWp = document.getElementById('body-wp');
+            wp.ranks.forEach((r, index) => {
+                bodyWp.innerHTML += `
+                    <tr class="${index === 0 ? 'table-pink fw-bold' : ''}">
+                        <td>${index + 1}</td>
+                        <td>${r.nama}</td>
+                        <td>${r.v.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
+            // Logic for best consensus
+            // Simply take the one that is #1 in SAW or WP, if they differ, mention both.
+            if (saw.ranks[0].id === wp.ranks[0].id) {
+                document.getElementById('best-alt').innerText = saw.ranks[0].nama;
+            } else {
+                document.getElementById('best-alt').innerText = `${saw.ranks[0].nama} (SAW) / ${wp.ranks[0].nama} (WP)`;
+                document.getElementById('best-alt').style.fontSize = '2.5rem';
+            }
+        });
+    </script>
+</body>
+</html>

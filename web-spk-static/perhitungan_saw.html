@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan SAW - SPK Kost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4 text-center text-pink fw-bold">Proses Perhitungan SAW</h2>
+
+                <!-- Formula Section -->
+                <div class="glass-card mb-4">
+                    <h4 class="text-pink mb-3"><i class="fas fa-square-root-variable me-2"></i>Rumus Perhitungan SAW</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">1. Normalisasi Matriks (R)</h5>
+                            <p class="small">Rumus untuk menormalkan matriks keputusan (X) menjadi matriks ternormalisasi (R):</p>
+                            <div class="math-box p-3 bg-light rounded mb-3 border-start border-pink border-4">
+                                <p class="mb-2"><strong>Benefit (Keuntungan):</strong></p>
+                                <code class="d-block mb-3">r<sub>ij</sub> = x<sub>ij</sub> / max(x<sub>ij</sub>)</code>
+                                <p class="mb-2"><strong>Cost (Biaya):</strong></p>
+                                <code class="d-block">r<sub>ij</sub> = min(x<sub>ij</sub>) / x<sub>ij</sub></code>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">2. Perankingan (V)</h5>
+                            <p class="small">Rumus untuk menghitung nilai preferensi (V) setiap alternatif:</p>
+                            <div class="math-box p-3 bg-light rounded border-start border-pink border-4">
+                                <code class="d-block mb-2">V<sub>i</sub> = &sum; (w<sub>j</sub> * r<sub>ij</sub>)</code>
+                                <p class="small text-muted mt-2">Dimana:<br>
+                                w<sub>j</sub> = Bobot Kriteria<br>
+                                r<sub>ij</sub> = Nilai Ternormalisasi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Matrix X -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">1. Matriks Keputusan (X)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-pink">
+                                <tr id="header-x"></tr>
+                            </thead>
+                            <tbody id="body-x"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Step 2: Normalization (R) -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">2. Matriks Ternormalisasi (R)</h4>
+                    <div id="normalization-info" class="mb-3 p-3 bg-light rounded small">
+                        <h6 class="fw-bold mb-2">Keterangan Nilai Max/Min:</h6>
+                        <ul id="crit-info-list" class="mb-0 list-unstyled row"></ul>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-pink">
+                                <tr id="header-r"></tr>
+                            </thead>
+                            <tbody id="body-r"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Step 3: Ranking -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">3. Hasil Akhir & Perankingan (SAW)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle">
+                            <thead class="bg-pink text-white">
+                                <tr>
+                                    <th style="width: 80px;">Rank</th>
+                                    <th>Nama Alternatif</th>
+                                    <th>Detail Perhitungan (W * R)</th>
+                                    <th style="width: 150px;">Nilai Akhir (V)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-rank"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const result = calculateSAW();
+            const criteria = DB.getKriteria();
+            const alternatif = DB.getAlternatif();
+
+            // Render Matrix X
+            const headerX = document.getElementById('header-x');
+            headerX.innerHTML = '<th>Alternatif</th>' + criteria.map(k => `<th>${k.kode}</th>`).join('');
+            
+            const bodyX = document.getElementById('body-x');
+            alternatif.forEach(a => {
+                let row = `<tr><td class="text-start"><strong>${a.nama}</strong></td>`;
+                criteria.forEach(k => {
+                    row += `<td>${result.matrix_x[a.id][k.id] || 0}</td>`;
+                });
+                row += '</tr>';
+                bodyX.innerHTML += row;
+            });
+
+            // Normalization Info (Max/Min)
+            const critInfoList = document.getElementById('crit-info-list');
+            criteria.forEach(k => {
+                const all_values = Object.values(result.matrix_x).map(row => row[k.id]).filter(v => v !== undefined);
+                const max = Math.max(...all_values);
+                const min = Math.min(...all_values);
+                critInfoList.innerHTML += `
+                    <li class="col-md-4 mb-1">
+                        <span class="badge bg-secondary me-1">${k.kode}</span>
+                        ${k.type === 'benefit' ? `Max: <strong>${max}</strong>` : `Min: <strong>${min}</strong>`}
+                    </li>
+                `;
+            });
+
+            // Render Matrix R
+            const headerR = document.getElementById('header-r');
+            headerR.innerHTML = '<th>Alternatif</th>' + criteria.map(k => `<th>${k.kode}</th>`).join('');
+            
+            const bodyR = document.getElementById('body-r');
+            alternatif.forEach(a => {
+                let row = `<tr><td class="text-start"><strong>${a.nama}</strong></td>`;
+                criteria.forEach(k => {
+                    const val = result.matrix_r[a.id][k.id] || 0;
+                    row += `<td>${val.toFixed(3)}</td>`;
+                });
+                row += '</tr>';
+                bodyR.innerHTML += row;
+            });
+
+            // Render Ranks with Detail
+            const bodyRank = document.getElementById('body-rank');
+            result.ranks.forEach((r, index) => {
+                // Construct detail string
+                let details = [];
+                criteria.forEach(k => {
+                    const r_val = result.matrix_r[r.id][k.id] || 0;
+                    details.push(`(${k.bobot} * ${r_val.toFixed(3)})`);
+                });
+                const detailStr = details.join(' + ');
+
+                bodyRank.innerHTML += `
+                    <tr>
+                        <td><span class="badge rounded-pill bg-pink px-3">${index + 1}</span></td>
+                        <td class="text-start"><strong>${r.nama}</strong></td>
+                        <td class="small text-muted text-start">${detailStr}</td>
+                        <td class="text-primary-pink fw-bold">${r.value.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>

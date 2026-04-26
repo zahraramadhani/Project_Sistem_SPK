@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan WP - SPK Kost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4 text-center text-pink fw-bold">Proses Perhitungan Weighted Product (WP)</h2>
+
+                <!-- Formula Section -->
+                <div class="glass-card mb-4">
+                    <h4 class="text-pink mb-3"><i class="fas fa-square-root-variable me-2"></i>Rumus Perhitungan WP</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="fw-bold">1. Perbaikan Bobot (W)</h5>
+                            <div class="math-box p-3 bg-light rounded mb-3 border-start border-pink border-4">
+                                <code class="d-block">w<sub>j</sub> = w<sub>j</sub> / &sum; w<sub>k</sub></code>
+                                <p class="small text-muted mt-2">Pangkat positif untuk benefit, negatif untuk cost.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="fw-bold">2. Vektor S</h5>
+                            <div class="math-box p-3 bg-light rounded mb-3 border-start border-pink border-4">
+                                <code class="d-block">S<sub>i</sub> = &prod; x<sub>ij</sub><sup>w<sub>j</sub></sup></code>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="fw-bold">3. Vektor V</h5>
+                            <div class="math-box p-3 bg-light rounded border-start border-pink border-4">
+                                <code class="d-block">V<sub>i</sub> = S<sub>i</sub> / &sum; S<sub>k</sub></code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Weight Normalization -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">1. Perbaikan Bobot (W)</h4>
+                    <div id="weight-info" class="mb-3 p-3 bg-light rounded small"></div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-pink">
+                                <tr>
+                                    <th>Kriteria</th>
+                                    <th>Bobot Awal</th>
+                                    <th>Tipe</th>
+                                    <th>Pangkat (wj)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-w"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Step 2: Vector S -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">2. Perhitungan Nilai Vektor S</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-pink">
+                                <tr>
+                                    <th>Alternatif</th>
+                                    <th>Detail Perhitungan (X<sup>w</sup>)</th>
+                                    <th>Nilai S</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-s"></tbody>
+                            <tfoot>
+                                <tr class="table-pink fw-bold">
+                                    <td colspan="2">Total Nilai S (&sum; S)</td>
+                                    <td id="total-s"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Step 3: Vector V & Ranking -->
+                <div class="glass-card">
+                    <h4 class="mb-3 text-pink">3. Hasil Akhir & Perankingan (WP)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle">
+                            <thead class="bg-pink text-white">
+                                <tr>
+                                    <th style="width: 80px;">Rank</th>
+                                    <th>Nama Alternatif</th>
+                                    <th>Detail (S<sub>i</sub> / &sum; S)</th>
+                                    <th style="width: 150px;">Nilai Vektor V</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-v"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const result = calculateWP();
+            const criteria = DB.getKriteria();
+            const totalInitialWeight = criteria.reduce((sum, k) => sum + k.bobot, 0);
+
+            // Weight Info
+            document.getElementById('weight-info').innerHTML = `Total Bobot Awal (&sum; w): <strong>${totalInitialWeight}</strong>`;
+
+            // Render Weights
+            const bodyW = document.getElementById('body-w');
+            result.kriteria_weights.forEach(k => {
+                bodyW.innerHTML += `
+                    <tr>
+                        <td class="text-start"><strong>${k.kode} - ${k.nama}</strong></td>
+                        <td>${k.bobot}</td>
+                        <td><span class="badge ${k.type === 'benefit' ? 'bg-success' : 'bg-danger'}">${k.type}</span></td>
+                        <td class="fw-bold text-pink">${k.w.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
+            // Render Vector S
+            const bodyS = document.getElementById('body-s');
+            result.matrix_s.forEach(s => {
+                let calcStr = criteria.map(k => {
+                    const val = result.matrix_x[s.id][k.id] || 0;
+                    const w = result.kriteria_weights.find(kw => kw.id === k.id).w;
+                    return `(${val}<sup>${w.toFixed(2)}</sup>)`;
+                }).join(' * ');
+
+                bodyS.innerHTML += `
+                    <tr>
+                        <td class="text-start"><strong>${s.nama}</strong></td>
+                        <td class="small text-muted text-start">${calcStr}</td>
+                        <td class="fw-bold text-pink">${s.s.toExponential(4)}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('total-s').innerText = result.total_s.toExponential(4);
+
+            // Render Vector V & Ranking
+            const bodyV = document.getElementById('body-v');
+            result.ranks.forEach((r, index) => {
+                bodyV.innerHTML += `
+                    <tr>
+                        <td><span class="badge rounded-pill bg-pink px-3">${index + 1}</span></td>
+                        <td class="text-start"><strong>${r.nama}</strong></td>
+                        <td class="small text-muted">${r.s.toExponential(2)} / ${result.total_s.toExponential(2)}</td>
+                        <td class="text-primary-pink fw-bold">${r.v.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
