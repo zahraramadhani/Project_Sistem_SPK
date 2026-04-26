@@ -1,0 +1,124 @@
+:root {
+    --primary-pink: #ff7eb9;
+    --secondary-pink: #ff65a3;
+    --light-pink: #ffe4f1;
+    --dark-pink: #d4418e;
+    --bg-pink: #fff0f6;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow: 0 8px 32px 0 rgba(255, 126, 185, 0.2);
+}
+
+body {
+    background: linear-gradient(135deg, #fff0f6 0%, #ffe4f1 100%);
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: #4a4a4a;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 2rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--dark-pink) !important;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #666 !important;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-pink) !important;
+}
+
+.btn-pink {
+    background: linear-gradient(45deg, var(--primary-pink), var(--secondary-pink));
+    border: none;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(255, 101, 163, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-pink:hover {
+    background: linear-gradient(45deg, var(--secondary-pink), var(--dark-pink));
+    color: white;
+    transform: scale(1.05);
+}
+
+.table {
+    background: transparent;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table thead {
+    background: var(--primary-pink);
+    color: white;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 126, 185, 0.05);
+}
+
+h1, h2, h3 {
+    color: var(--dark-pink);
+    font-weight: 700;
+}
+
+.badge-pink {
+    background-color: var(--light-pink);
+    color: var(--dark-pink);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+}
+
+.footer {
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--secondary-pink);
+    font-weight: 500;
+}
+
+.watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0.3;
+    z-index: 9999;
+    pointer-events: none;
+    font-size: 0.8rem;
+    color: var(--dark-pink);
+    background: var(--glass-bg);
+    padding: 5px 15px;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(5px);
+}

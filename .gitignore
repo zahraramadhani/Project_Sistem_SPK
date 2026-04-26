@@ -1,0 +1,9 @@
+# Database config (contain local credentials)
+# config/database.php
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Laragon/Server files
+.htaccess
