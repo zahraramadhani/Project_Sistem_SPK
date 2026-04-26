@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Kriteria - SPK Kost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="glass-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-list-check me-2"></i>Daftar Kriteria</h2>
+                        <button class="btn btn-pink" data-bs-toggle="modal" data-bs-target="#addModal">
+                            <i class="fas fa-plus me-1"></i> Tambah Kriteria
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode</th>
+                                    <th>Nama Kriteria</th>
+                                    <th>Type</th>
+                                    <th>Bobot</th>
+                                    <th width="150">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="criteria-list">
+                                <!-- Data will be loaded here via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-pink text-white">
+                    <h5 class="modal-title">Tambah Kriteria Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="add-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Kode Kriteria (Contoh: C1)</label>
+                            <input type="text" name="kode" class="form-control" required placeholder="C1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Kriteria</label>
+                            <input type="text" name="nama" class="form-control" required placeholder="Harga Sewa">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipe Kriteria</label>
+                            <select name="type" class="form-select" required>
+                                <option value="benefit">Benefit</option>
+                                <option value="cost">Cost</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bobot (0 - 1)</label>
+                            <input type="number" name="bobot" step="0.01" min="0" max="1" class="form-control" required placeholder="0.25">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-pink">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        function renderCriteria() {
+            const criteria = DB.getKriteria();
+            const tbody = document.getElementById('criteria-list');
+            tbody.innerHTML = '';
+            
+            criteria.forEach((k, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><span class="badge bg-pink">${k.kode}</span></td>
+                        <td>${k.nama}</td>
+                        <td>
+                            <span class="badge ${k.type === 'benefit' ? 'bg-success' : 'bg-warning'} text-white">
+                                ${k.type.toUpperCase()}
+                            </span>
+                        </td>
+                        <td class="fw-bold">${k.bobot}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCriteria(${k.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('add-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const criteria = DB.getKriteria();
+            
+            const newK = {
+                id: Date.now(),
+                kode: formData.get('kode'),
+                nama: formData.get('nama'),
+                type: formData.get('type'),
+                bobot: parseFloat(formData.get('bobot'))
+            };
+
+            criteria.push(newK);
+            DB.setKriteria(criteria);
+            
+            bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
+            this.reset();
+            renderCriteria();
+        });
+
+        window.deleteCriteria = (id) => {
+            if (confirm('Yakin ingin menghapus kriteria ini?')) {
+                const criteria = DB.getKriteria().filter(k => k.id !== id);
+                DB.setKriteria(criteria);
+                renderCriteria();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', renderCriteria);
+    </script>
+</body>
+</html>

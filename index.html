@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPK Pemilihan Kost - Pink Edition (Static)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="main-content">
+        <div class="row">
+            <div class="col-md-12 text-center mb-5">
+                <h1 class="display-4">Selamat Datang di SPK Kost</h1>
+                <p class="lead">Sistem Pendukung Keputusan Pemilihan Kost Terbaik menggunakan metode SAW & WP</p>
+
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-6 mb-4">
+                <div class="glass-card">
+                    <i class="fas fa-list-check fa-3x mb-3 text-primary-pink"></i>
+                    <h3 id="countK">0 Kriteria</h3>
+                    <p>Parameter yang digunakan dalam penilaian kost.</p>
+                    <a href="kriteria.html" class="btn btn-pink mt-2">Kelola Kriteria</a>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="glass-card">
+                    <i class="fas fa-users fa-3x mb-3 text-secondary-pink"></i>
+                    <h3 id="countA">0 Alternatif</h3>
+                    <p>Daftar kos-kosan yang akan dihitung dan dibandingkan.</p>
+                    <a href="alternatif.html" class="btn btn-pink mt-2">Kelola Alternatif</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="glass-card">
+                    <h2 class="mb-4"><i class="fas fa-info-circle me-2"></i>Tentang Sistem</h2>
+                    <p>Sistem ini dirancang untuk membantu mahasiswa dalam menentukan pilihan kost terbaik di sekitar
+                        kampus.
+                        Dengan menggunakan data real, sistem ini memproses kriteria seperti harga, jarak, dan fasilitas
+                        menggunakan dua metode ilmiah:</p>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded shadow-sm bg-white mb-3">
+                                <h5 class="text-pink"><i class="fas fa-calculator me-2"></i>Simple Additive Weighting
+                                    (SAW)</h5>
+                                <p class="small text-muted">Sering dikenal sebagai metode penjumlahan terbobot. Mencari
+                                    penjumlahan terbobot dari rating kinerja pada setiap alternatif pada semua atribut.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded shadow-sm bg-white mb-3">
+                                <h5 class="text-pink"><i class="fas fa-chart-line me-2"></i>Weighted Product (WP)</h5>
+                                <p class="small text-muted">Menggunakan perkalian untuk menghubungkan rating atribut, di
+                                    mana
+                                    rating setiap atribut harus dipangkatkan terlebih dahulu dengan bobot atribut yang
+                                    bersangkutan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('countK').innerText = DB.getKriteria().length + ' Kriteria';
+            document.getElementById('countA').innerText = DB.getAlternatif().length + ' Alternatif';
+        });
+    </script>
+</body>
+
+</html>
