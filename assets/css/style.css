@@ -81,7 +81,8 @@ body {
 
 .table thead {
     background: var(--primary-pink);
-    color: white;
+    color: #000;
+    font-weight: 700;
 }
 
 .table-hover tbody tr:hover {
@@ -91,6 +92,25 @@ body {
 h1, h2, h3 {
     color: var(--dark-pink);
     font-weight: 700;
+}
+
+.bg-pink {
+    background-color: var(--primary-pink) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.badge.bg-pink {
+    color: #000000 !important;
+}
+
+.bg-light-pink {
+    background-color: var(--light-pink) !important;
+    color: var(--dark-pink) !important;
+}
+
+.text-pink {
+    color: var(--dark-pink) !important;
 }
 
 .badge-pink {
