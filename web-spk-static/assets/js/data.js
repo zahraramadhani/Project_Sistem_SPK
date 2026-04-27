@@ -158,3 +158,71 @@ function calculateWP() {
 
     return { matrix_x, matrix_s, matrix_v, ranks, total_s, kriteria_weights };
 }
+
+// SMART Calculation Logic
+function calculateSMART() {
+    const kriteria = DB.getKriteria();
+    const alternatif = DB.getAlternatif();
+    const penilaian = DB.getPenilaian();
+
+    // Map scores
+    const matrix_x = {};
+    penilaian.forEach(p => {
+        if (!matrix_x[p.id_alternatif]) matrix_x[p.id_alternatif] = {};
+        matrix_x[p.id_alternatif][p.id_kriteria] = p.nilai;
+    });
+
+    // Step 1: Normalization of weights
+    const total_bobot = kriteria.reduce((sum, k) => sum + k.bobot, 0);
+    const kriteria_normalized = kriteria.map(k => ({
+        ...k,
+        w_norm: k.bobot / total_bobot
+    }));
+
+    // Step 2: Calculate Utility (u)
+    const matrix_u = {};
+    kriteria.forEach(k => {
+        const crit_id = k.id;
+        const all_values = Object.values(matrix_x).map(row => row[crit_id]).filter(v => v !== undefined);
+        if (all_values.length === 0) return;
+
+        const max = Math.max(...all_values);
+        const min = Math.min(...all_values);
+
+        alternatif.forEach(a => {
+            const alt_id = a.id;
+            if (!matrix_u[alt_id]) matrix_u[alt_id] = {};
+            const val = matrix_x[alt_id] ? matrix_x[alt_id][crit_id] : 0;
+
+            // Utility Formula
+            // Benefit: (Cout - Cmin) / (Cmax - Cmin) * 100
+            // Cost: (Cmax - Cout) / (Cmax - Cmin) * 100
+            if (max === min) {
+                matrix_u[alt_id][crit_id] = 100;
+            } else {
+                if (k.type === 'benefit') {
+                    matrix_u[alt_id][crit_id] = ((val - min) / (max - min)) * 100;
+                } else {
+                    matrix_u[alt_id][crit_id] = ((max - val) / (max - min)) * 100;
+                }
+            }
+        });
+    });
+
+    // Step 3: Final Score (Total Utility)
+    const ranks = alternatif.map(a => {
+        const alt_id = a.id;
+        let total_utility = 0;
+        kriteria_normalized.forEach(k => {
+            const crit_id = k.id;
+            const u_val = matrix_u[alt_id] ? (matrix_u[alt_id][crit_id] || 0) : 0;
+            total_utility += (u_val * k.w_norm);
+        });
+        return { id: alt_id, nama: a.nama, value: total_utility };
+    });
+
+    // Sort descending
+    ranks.sort((a, b) => b.value - a.value);
+
+    return { matrix_x, kriteria_normalized, matrix_u, ranks };
+}

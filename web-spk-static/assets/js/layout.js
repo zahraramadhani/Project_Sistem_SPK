@@ -32,6 +32,7 @@ const Layout = {
                                 <ul class="dropdown-menu border-0 shadow">
                                     <li><a class="dropdown-item" href="perhitungan_saw.html">Metode SAW</a></li>
                                     <li><a class="dropdown-item" href="perhitungan_wp.html">Metode WP</a></li>
+                                    <li><a class="dropdown-item" href="perhitungan_smart.html">Metode SMART</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">

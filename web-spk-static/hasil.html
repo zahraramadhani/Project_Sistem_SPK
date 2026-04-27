@@ -20,7 +20,7 @@
 
         <div class="row">
             <!-- SAW Results -->
-            <div class="col-md-6 mb-4">
+            <div class="col-md-4 mb-4">
                 <div class="glass-card h-100">
                     <h4 class="text-center mb-4"><i class="fas fa-calculator me-2 text-pink"></i>Metode SAW</h4>
                     <div class="table-responsive">
@@ -39,7 +39,7 @@
             </div>
 
             <!-- WP Results -->
-            <div class="col-md-6 mb-4">
+            <div class="col-md-4 mb-4">
                 <div class="glass-card h-100">
                     <h4 class="text-center mb-4"><i class="fas fa-chart-line me-2 text-pink"></i>Metode WP</h4>
                     <div class="table-responsive">
@@ -56,13 +56,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SMART Results -->
+            <div class="col-md-4 mb-4">
+                <div class="glass-card h-100">
+                    <h4 class="text-center mb-4"><i class="fas fa-star me-2 text-pink"></i>Metode SMART</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="bg-pink text-white">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Alternatif</th>
+                                    <th>Nilai V</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-smart"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="glass-card bg-pink text-white text-center">
                     <h3><i class="fas fa-trophy me-2"></i>Rekomendasi Terbaik</h3>
-                    <p class="lead mb-0">Berdasarkan konsensus kedua metode, alternatif terbaik adalah:</p>
+                    <p class="lead mb-0">Berdasarkan konsensus ketiga metode, alternatif terbaik adalah:</p>
                     <h1 class="display-4 fw-bold mt-2" id="best-alt">-</h1>
                 </div>
             </div>
@@ -77,6 +96,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const saw = calculateSAW();
             const wp = calculateWP();
+            const smart = calculateSMART();
 
             const bodySaw = document.getElementById('body-saw');
             saw.ranks.forEach((r, index) => {
@@ -100,13 +120,29 @@
                 `;
             });
 
+            const bodySmart = document.getElementById('body-smart');
+            smart.ranks.forEach((r, index) => {
+                bodySmart.innerHTML += `
+                    <tr class="${index === 0 ? 'table-pink fw-bold' : ''}">
+                        <td>${index + 1}</td>
+                        <td>${r.nama}</td>
+                        <td>${r.value.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
             // Logic for best consensus
-            // Simply take the one that is #1 in SAW or WP, if they differ, mention both.
-            if (saw.ranks[0].id === wp.ranks[0].id) {
-                document.getElementById('best-alt').innerText = saw.ranks[0].nama;
+            const counts = {};
+            [saw.ranks[0], wp.ranks[0], smart.ranks[0]].forEach(r => {
+                counts[r.nama] = (counts[r.nama] || 0) + 1;
+            });
+
+            let best = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            if (best[0][1] >= 2) {
+                document.getElementById('best-alt').innerText = best[0][0];
             } else {
-                document.getElementById('best-alt').innerText = `${saw.ranks[0].nama} (SAW) / ${wp.ranks[0].nama} (WP)`;
-                document.getElementById('best-alt').style.fontSize = '2.5rem';
+                document.getElementById('best-alt').innerText = "Terdapat Perbedaan Hasil";
+                document.getElementById('best-alt').style.fontSize = '2rem';
             }
         });
     </script>
